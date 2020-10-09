@@ -31,6 +31,15 @@ void PlayScene::draw()
 void PlayScene::update()
 {
 	updateDisplayList();
+
+	// Check if position is changed
+
+	// Check if distance value is changed
+
+	// Check and Display Variable Labels
+	// Distance
+	// Velocity
+
 }
 
 void PlayScene::clean()
@@ -41,64 +50,6 @@ void PlayScene::clean()
 void PlayScene::handleEvents()
 {
 	EventManager::Instance().update();
-
-	// handle player movement with GameController
-	if (SDL_NumJoysticks() > 0)
-	{
-		if (EventManager::Instance().getGameController(0) != nullptr)
-		{
-			const auto deadZone = 10000;
-			if (EventManager::Instance().getGameController(0)->LEFT_STICK_X > deadZone)
-			{
-				m_pPlayer->setAnimationState(PLAYER_RUN_RIGHT);
-				m_playerFacingRight = true;
-			}
-			else if (EventManager::Instance().getGameController(0)->LEFT_STICK_X < -deadZone)
-			{
-				m_pPlayer->setAnimationState(PLAYER_RUN_LEFT);
-				m_playerFacingRight = false;
-			}
-			else
-			{
-				if (m_playerFacingRight)
-				{
-					m_pPlayer->setAnimationState(PLAYER_IDLE_RIGHT);
-				}
-				else
-				{
-					m_pPlayer->setAnimationState(PLAYER_IDLE_LEFT);
-				}
-			}
-		}
-	}
-
-
-	// handle player movement if no Game Controllers found
-	if (SDL_NumJoysticks() < 1)
-	{
-		if (EventManager::Instance().isKeyDown(SDL_SCANCODE_A))
-		{
-			m_pPlayer->setAnimationState(PLAYER_RUN_LEFT);
-			m_playerFacingRight = false;
-		}
-		else if (EventManager::Instance().isKeyDown(SDL_SCANCODE_D))
-		{
-			m_pPlayer->setAnimationState(PLAYER_RUN_RIGHT);
-			m_playerFacingRight = true;
-		}
-		else
-		{
-			if (m_playerFacingRight)
-			{
-				m_pPlayer->setAnimationState(PLAYER_IDLE_RIGHT);
-			}
-			else
-			{
-				m_pPlayer->setAnimationState(PLAYER_IDLE_LEFT);
-			}
-		}
-	}
-	
 
 	if (EventManager::Instance().isKeyDown(SDL_SCANCODE_ESCAPE))
 	{
@@ -126,7 +77,21 @@ void PlayScene::start()
 	// Player Sprite
 	m_pPlayer = new Player();
 	addChild(m_pPlayer);
-	m_playerFacingRight = true;
+
+	// Display Variable Labels
+	const SDL_Color white = { 255, 255, 255, 255 };
+	// Distance
+	m_pDistanceLabel = new Label("Distance: ", "Consolas", 20, white, glm::vec2(680.0f, 30.0f));
+	m_pDistanceLabel->setParent(this);
+	addChild(m_pDistanceLabel);
+	// Velocity
+	m_pVelocityLabel = new Label("Velocity: ", "Consolas", 20, white, glm::vec2(680.0f, 60.0f));
+	m_pVelocityLabel->setParent(this);
+	addChild(m_pVelocityLabel);
+	// Scale
+	m_pPPMLabel = new Label("Scale: 1px:1m", "Consolas", 15, white, glm::vec2(730.0f, 585.0f));
+	m_pPPMLabel->setParent(this);
+	addChild(m_pPPMLabel);
 
 	// Back Button
 	m_pBackButton = new Button("../Assets/textures/backButton.png", "backButton", BACK_BUTTON);
@@ -171,9 +136,18 @@ void PlayScene::start()
 
 	/* Instructions Label */
 	m_pInstructionsLabel = new Label("Press the backtick (`) character to toggle Debug View", "Consolas");
-	m_pInstructionsLabel->getTransform()->position = glm::vec2(Config::SCREEN_WIDTH * 0.5f, 500.0f);
+	m_pInstructionsLabel->getTransform()->position = glm::vec2(Config::SCREEN_WIDTH * 0.5f, 90.0f);
 
 	addChild(m_pInstructionsLabel);
+}
+
+// Set Placeholders for GUI Sliders
+void PlayScene::setImGuiSliders()
+{
+	//ImGuiSliders[0] = // stormtrooper pos
+	//ImGuiSliders[1] = // wookiee pos
+	//ImGuiSliders[2] = // thermal detonator velocity
+	//ImGuiSliders[3] = // thermal detonator angle
 }
 
 void PlayScene::GUI_Function() const
@@ -188,19 +162,38 @@ void PlayScene::GUI_Function() const
 
 	if(ImGui::Button("Throw Detonator"))
 	{
-		std::cout << "Detonator Thrown!" << std::endl;
+		// Throw Detonator
+	}
+	if (ImGui::Button("Reset to Default Values"))
+	{
+		// Reset All Variables To Default
 	}
 
 	ImGui::Separator();
 
-	static float float3[3] = { 0.0f, 1.0f, 1.5f };
-	if(ImGui::SliderFloat3("My Slider", float3, 0.0f, 2.0f))
+	bool tempGravity = false;
+
+	if (ImGui::Checkbox("Gravity Enabled", &tempGravity))
 	{
-		std::cout << float3[0] << std::endl;
-		std::cout << float3[1] << std::endl;
-		std::cout << float3[2] << std::endl;
-		std::cout << "---------------------------\n";
+		// Enable Gravity
 	}
+
+	float tempStormPos = 485.0f;
+	if (ImGui::SliderFloat("Stormtrooper's Position", &tempStormPos, 50, 800))
+	{
+		// Move Stormtrooper
+	}
+	float tempWookPos = 485.0f;
+	if (ImGui::SliderFloat("Wookiee's Position", &tempWookPos, 50, 800))
+	{
+		// Move Wookiee
+	}
+	float tempVel[2] = { 95.0f, 45.0f };
+	if (ImGui::SliderFloat2("Velocity | Angle", &tempVel[0], 0, 90))
+	{
+		// Change Velocity, Change Angle
+	}
+
 	
 	ImGui::End();
 

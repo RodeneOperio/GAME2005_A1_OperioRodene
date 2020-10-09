@@ -20,23 +20,32 @@ public:
 	virtual void clean() override;
 	virtual void handleEvents() override;
 	virtual void start() override;
+
+	float ImGuiSliders[4]; // Control Different Variables in One array
+	void setImGuiSliders(); // Set which index controls each variable
 private:
 	// IMGUI Function
 	void GUI_Function() const;
 	std::string m_guiTitle;
 	
 	glm::vec2 m_mousePosition;
-
-	Plane* m_pPlaneSprite;
-	//Target 
-	//Enemy
+	
+	// Target 
+	//Target* m_pThermalDetonator;
+	// Enemy
+	//Enemy* m_pEnemy;
+	// Player
 	Player* m_pPlayer;
-	bool m_playerFacingRight;
+
 
 	// UI Items
 	Button* m_pBackButton;
 	Button* m_pNextButton;
 	Label* m_pInstructionsLabel;
+	// Display Labels
+	Label* m_pDistanceLabel; // Distance Label
+	Label* m_pVelocityLabel; // Velocity Label
+	Label* m_pPPMLabel; // Pixel per Meter Label
 };
 
 #endif /* defined (__PLAY_SCENE__) */
