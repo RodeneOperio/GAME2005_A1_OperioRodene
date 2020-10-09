@@ -28,6 +28,8 @@ private:
 	glm::vec2 m_mousePosition;
 
 	Plane* m_pPlaneSprite;
+	//Target 
+	//Enemy
 	Player* m_pPlayer;
 	bool m_playerFacingRight;
 

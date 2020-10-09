@@ -17,6 +17,8 @@ PlayScene::~PlayScene()
 
 void PlayScene::draw()
 {
+	TextureManager::Instance()->draw("playsceneBackground", 400, 300, 0, 255, true); // Draw playscene background
+	
 	if(EventManager::Instance().isIMGUIActive())
 	{
 		GUI_Function();
@@ -116,13 +118,11 @@ void PlayScene::handleEvents()
 
 void PlayScene::start()
 {
+	TextureManager::Instance()->load("../Assets/textures/playsceneBackground.png", "playsceneBackground"); // Load Background
+
 	// Set GUI Title
 	m_guiTitle = "Play Scene";
 	
-	// Plane Sprite
-	m_pPlaneSprite = new Plane();
-	addChild(m_pPlaneSprite);
-
 	// Player Sprite
 	m_pPlayer = new Player();
 	addChild(m_pPlayer);
@@ -130,7 +130,7 @@ void PlayScene::start()
 
 	// Back Button
 	m_pBackButton = new Button("../Assets/textures/backButton.png", "backButton", BACK_BUTTON);
-	m_pBackButton->getTransform()->position = glm::vec2(300.0f, 400.0f);
+	m_pBackButton->getTransform()->position = glm::vec2(200.0f, 550.0f);
 	m_pBackButton->addEventListener(CLICK, [&]()-> void
 	{
 		m_pBackButton->setActive(false);
@@ -150,7 +150,7 @@ void PlayScene::start()
 
 	// Next Button
 	m_pNextButton = new Button("../Assets/textures/nextButton.png", "nextButton", NEXT_BUTTON);
-	m_pNextButton->getTransform()->position = glm::vec2(500.0f, 400.0f);
+	m_pNextButton->getTransform()->position = glm::vec2(600.0f, 550.0f);
 	m_pNextButton->addEventListener(CLICK, [&]()-> void
 	{
 		m_pNextButton->setActive(false);
@@ -184,11 +184,11 @@ void PlayScene::GUI_Function() const
 	// See examples by uncommenting the following - also look at imgui_demo.cpp in the IMGUI filter
 	//ImGui::ShowDemoWindow();
 	
-	ImGui::Begin("Your Window Title Goes Here", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_MenuBar);
+	ImGui::Begin("Variable Control Center", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_MenuBar);
 
-	if(ImGui::Button("My Button"))
+	if(ImGui::Button("Throw Detonator"))
 	{
-		std::cout << "My Button Pressed" << std::endl;
+		std::cout << "Detonator Thrown!" << std::endl;
 	}
 
 	ImGui::Separator();
