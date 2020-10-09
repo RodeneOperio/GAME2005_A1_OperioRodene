@@ -14,6 +14,11 @@ public:
 	virtual void update() override;
 	virtual void clean() override;
 
+	// Throwing Related Functions/Variables
+	void doThrow();
+	bool isGravityEnabled = false;
+	glm::vec2 throwSpeed;
+	glm::vec2 throwPosition;
 private:
 	void m_move();
 	void m_checkBounds();

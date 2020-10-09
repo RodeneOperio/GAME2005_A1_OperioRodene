@@ -7,6 +7,7 @@
 #include "Player.h"
 #include "Button.h"
 #include "Label.h"
+#include "Target.h"
 
 class PlayScene : public Scene
 {
@@ -21,8 +22,6 @@ public:
 	virtual void handleEvents() override;
 	virtual void start() override;
 
-	float ImGuiSliders[4]; // Control Different Variables in One array
-	void setImGuiSliders(); // Set which index controls each variable
 private:
 	// IMGUI Function
 	void GUI_Function() const;
@@ -31,21 +30,21 @@ private:
 	glm::vec2 m_mousePosition;
 	
 	// Target 
-	//Target* m_pThermalDetonator;
-	// Enemy
-	//Enemy* m_pEnemy;
+	Target* m_pThermalDetonator;
 	// Player
 	Player* m_pPlayer;
-
+	bool m_isGravityEnabled = false;
 
 	// UI Items
 	Button* m_pBackButton;
 	Button* m_pNextButton;
 	Label* m_pInstructionsLabel;
+	bool* m_isGravityEnabledCB = &m_isGravityEnabled;
 	// Display Labels
 	Label* m_pDistanceLabel; // Distance Label
-	Label* m_pVelocityLabel; // Velocity Label
 	Label* m_pPPMLabel; // Pixel per Meter Label
+
+	Label* m_pDistanceValue; // 485m
 };
 
 #endif /* defined (__PLAY_SCENE__) */

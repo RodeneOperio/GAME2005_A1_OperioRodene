@@ -18,6 +18,9 @@ PlayScene::~PlayScene()
 void PlayScene::draw()
 {
 	TextureManager::Instance()->draw("playsceneBackground", 400, 300, 0, 255, true); // Draw playscene background
+	TextureManager::Instance()->draw("Stormtroopers", 515, 500, 0, 255, true); // Draw Stormtroopers
+	TextureManager::Instance()->draw("Stormtroopers", 485, 500, 0, 255, true); // Draw Stormtroopers
+	TextureManager::Instance()->draw("Stormtroopers", 455, 500, 0, 255, true); // Draw Stormtroopers
 	
 	if(EventManager::Instance().isIMGUIActive())
 	{
@@ -32,14 +35,11 @@ void PlayScene::update()
 {
 	updateDisplayList();
 
-	// Check if position is changed
-
-	// Check if distance value is changed
-
 	// Check and Display Variable Labels
 	// Distance
-	// Velocity
-
+	float distanceTravelled = 0;
+	distanceTravelled = m_pThermalDetonator->getTransform()->position.x;
+	m_pDistanceLabel->setText("Distance Travelled = " + std::to_string(distanceTravelled));
 }
 
 void PlayScene::clean()
@@ -70,7 +70,7 @@ void PlayScene::handleEvents()
 void PlayScene::start()
 {
 	TextureManager::Instance()->load("../Assets/textures/playsceneBackground.png", "playsceneBackground"); // Load Background
-
+	TextureManager::Instance()->load("../Assets/textures/StormTrooper.png", "Stormtroopers"); // Load Stormtrooper 
 	// Set GUI Title
 	m_guiTitle = "Play Scene";
 	
@@ -78,24 +78,30 @@ void PlayScene::start()
 	m_pPlayer = new Player();
 	addChild(m_pPlayer);
 
+	// Target Sprite
+	m_pThermalDetonator = new Target();
+	addChild(m_pThermalDetonator);
+
 	// Display Variable Labels
 	const SDL_Color white = { 255, 255, 255, 255 };
 	// Distance
-	m_pDistanceLabel = new Label("Distance: ", "Consolas", 20, white, glm::vec2(680.0f, 30.0f));
+	m_pDistanceLabel = new Label("Distance: ", "Consolas", 20, white, glm::vec2(630.0f, 30.0f));
 	m_pDistanceLabel->setParent(this);
 	addChild(m_pDistanceLabel);
-	// Velocity
-	m_pVelocityLabel = new Label("Velocity: ", "Consolas", 20, white, glm::vec2(680.0f, 60.0f));
-	m_pVelocityLabel->setParent(this);
-	addChild(m_pVelocityLabel);
+	
+	// Distance Value
+	m_pDistanceValue = new Label("485m", "Consolas", 20, white, glm::vec2(475.0f, 430.0f));
+	m_pDistanceValue->setParent(this);
+	addChild(m_pDistanceValue);
+
 	// Scale
-	m_pPPMLabel = new Label("Scale: 1px:1m", "Consolas", 15, white, glm::vec2(730.0f, 585.0f));
+	m_pPPMLabel = new Label("Scale: 1px:1m", "Consolas", 15, white, glm::vec2(750.0f, 585.0f));
 	m_pPPMLabel->setParent(this);
 	addChild(m_pPPMLabel);
 
 	// Back Button
 	m_pBackButton = new Button("../Assets/textures/backButton.png", "backButton", BACK_BUTTON);
-	m_pBackButton->getTransform()->position = glm::vec2(200.0f, 550.0f);
+	m_pBackButton->getTransform()->position = glm::vec2(200.0f, 130.0f);
 	m_pBackButton->addEventListener(CLICK, [&]()-> void
 	{
 		m_pBackButton->setActive(false);
@@ -115,7 +121,7 @@ void PlayScene::start()
 
 	// Next Button
 	m_pNextButton = new Button("../Assets/textures/nextButton.png", "nextButton", NEXT_BUTTON);
-	m_pNextButton->getTransform()->position = glm::vec2(600.0f, 550.0f);
+	m_pNextButton->getTransform()->position = glm::vec2(600.0f, 130.0f);
 	m_pNextButton->addEventListener(CLICK, [&]()-> void
 	{
 		m_pNextButton->setActive(false);
@@ -141,15 +147,6 @@ void PlayScene::start()
 	addChild(m_pInstructionsLabel);
 }
 
-// Set Placeholders for GUI Sliders
-void PlayScene::setImGuiSliders()
-{
-	//ImGuiSliders[0] = // stormtrooper pos
-	//ImGuiSliders[1] = // wookiee pos
-	//ImGuiSliders[2] = // thermal detonator velocity
-	//ImGuiSliders[3] = // thermal detonator angle
-}
-
 void PlayScene::GUI_Function() const
 {
 	// Always open with a NewFrame
@@ -162,39 +159,52 @@ void PlayScene::GUI_Function() const
 
 	if(ImGui::Button("Throw Detonator"))
 	{
-		// Throw Detonator
-	}
-	if (ImGui::Button("Reset to Default Values"))
-	{
-		// Reset All Variables To Default
+		m_pThermalDetonator->doThrow();
 	}
 
+	static int playerPosX = 0;
+	static float VelAngle[2] = { 0, 0 };
+
+	if (ImGui::Button("Reset to Default Values for Question A"))
+	{
+		// Position Reset
+		playerPosX = 0;
+		m_pPlayer->getTransform()->position.x = 0;
+		m_pThermalDetonator->throwPosition = glm::vec2(0, 500);
+		// Variable Reset
+		VelAngle[0] = 95; // Velocity
+		VelAngle[1] = 16; // Angle
+		m_pThermalDetonator->throwSpeed = glm::vec2(VelAngle[0], -VelAngle[1]);
+	}
+	if (ImGui::Button("Reset to Default Values for Question B"))
+	{
+		// Position Reset
+		playerPosX = 0;
+		m_pPlayer->getTransform()->position.x = 0;
+		m_pThermalDetonator->throwPosition = glm::vec2(0, 500);
+		// Variable Reset
+		VelAngle[0] = 95; // Velocity
+		VelAngle[1] = 45; // Angle
+		m_pThermalDetonator->throwSpeed = glm::vec2(VelAngle[0], -VelAngle[1]);
+	}
 	ImGui::Separator();
 
-	bool tempGravity = false;
-
-	if (ImGui::Checkbox("Gravity Enabled", &tempGravity))
+	if (ImGui::Checkbox("Gravity Enabled", m_isGravityEnabledCB));
 	{
-		// Enable Gravity
+		m_pThermalDetonator->isGravityEnabled = *m_isGravityEnabledCB;
 	}
 
-	float tempStormPos = 485.0f;
-	if (ImGui::SliderFloat("Stormtrooper's Position", &tempStormPos, 50, 800))
+	if (ImGui::SliderInt("Player's Position", &playerPosX, 0, 800))
 	{
-		// Move Stormtrooper
-	}
-	float tempWookPos = 485.0f;
-	if (ImGui::SliderFloat("Wookiee's Position", &tempWookPos, 50, 800))
-	{
-		// Move Wookiee
-	}
-	float tempVel[2] = { 95.0f, 45.0f };
-	if (ImGui::SliderFloat2("Velocity | Angle", &tempVel[0], 0, 90))
-	{
-		// Change Velocity, Change Angle
+		m_pPlayer->getTransform()->position.x = playerPosX;
+		m_pThermalDetonator->throwPosition = glm::vec2(playerPosX, 500);
 	}
 
-	
+	if (ImGui::SliderFloat2("Velocity | Angle", VelAngle, 0, 180))
+	{
+		m_pThermalDetonator->throwSpeed = glm::vec2(VelAngle[0], -VelAngle[1]);
+	}
+
 	ImGui::End();
 
 	// Don't Remove this

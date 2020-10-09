@@ -4,12 +4,12 @@
 
 Target::Target()
 {
-	TextureManager::Instance()->load("../Assets/textures/Circle.png","circle");
+	TextureManager::Instance()->load("../Assets/textures/ThermalDetonator.png","TD");
 
-	const auto size = TextureManager::Instance()->getTextureSize("circle");
+	const auto size = TextureManager::Instance()->getTextureSize("TD");
 	setWidth(size.x);
 	setHeight(size.y);
-	getTransform()->position = glm::vec2(100.0f, 100.0f);
+	getTransform()->position = glm::vec2(0, 500.0f);
 	getRigidBody()->velocity = glm::vec2(0, 0);
 	getRigidBody()->isColliding = false;
 
@@ -26,7 +26,7 @@ void Target::draw()
 	const auto y = getTransform()->position.y;
 
 	// draw the target
-	TextureManager::Instance()->draw("circle", x, y, 0, 255, true);
+	TextureManager::Instance()->draw("TD", x, y, 0, 255, true);
 }
 
 void Target::update()
@@ -41,7 +41,15 @@ void Target::clean()
 
 void Target::m_move()
 {
-	getTransform()->position = getTransform()->position + getRigidBody()->velocity * 5.0f;
+	float deltaTime = 1.0f / 60.0f;
+	getRigidBody()->acceleration = glm::vec2(0, 9.8);
+	getRigidBody()->velocity += getRigidBody()->acceleration * deltaTime;
+
+	if (!isGravityEnabled)
+	{
+		getRigidBody()->velocity.y = 0;
+	}
+	getTransform()->position += getRigidBody()->velocity * deltaTime;
 }
 
 void Target::m_checkBounds()
@@ -51,3 +59,10 @@ void Target::m_checkBounds()
 void Target::m_reset()
 {
 }
+
+void Target::doThrow()
+{
+	getTransform()->position = throwPosition;
+	getRigidBody()->velocity = throwSpeed;
+}
+
